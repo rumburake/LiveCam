@@ -1,0 +1,15 @@
+<!--
+  ~ Copyright (c) 2020 rumburake@gmail.com
+  -->
+
+<resources>
+    <string name="app_name">Live Camera Plugins</string>
+    <string name="cannot_run_face_detect">Cannot run face detect without permission to use the Camera!</string>
+    <string name="understood">Understood</string>
+    <string name="exception">Exception: %1$s</string>
+    <string name="align_face">Align Face</string>
+    <string name="move_left">Move Left</string>
+    <string name="move_right">Move Right</string>
+    <string name="come_closer">Come Closer</string>
+    <string name="ready">Ready!</string>
+</resources>
