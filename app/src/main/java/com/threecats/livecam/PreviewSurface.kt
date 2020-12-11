@@ -1,103 +1,83 @@
 /*
  * Copyright (c) 2020 rumburake@gmail.com
  */
+package com.threecats.livecam
 
-package com.threecats.livecam;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.AttributeSet
+import android.view.SurfaceHolder
+import android.view.SurfaceView
+import com.google.android.gms.vision.CameraSource
+import timber.log.Timber
+import java.io.IOException
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+class PreviewSurface @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : SurfaceView(context, attrs, defStyleAttr) {
+    var cameraSource: CameraSource? = null
+    var surfaceReady = false
+    var permissionReady = false
+    var liveCamSystem: LiveCamSystem? = null
 
-import com.google.android.gms.vision.CameraSource;
-
-import java.io.IOException;
-
-import timber.log.Timber;
-
-public class PreviewSurface extends SurfaceView {
-
-    CameraSource cameraSource;
-    boolean surfaceReady = false;
-    boolean permissionReady = false;
-    LiveCamSystem liveCamSystem;
-
-    public PreviewSurface(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-
-        setCallback();
-    }
-
-    public PreviewSurface(Context context) {
-        this(context, null);
-    }
-
-    public PreviewSurface(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    void stop() {
-        if (cameraSource != null) {
-            cameraSource.stop();
-            cameraSource = null;
+    fun stop() {
+        cameraSource?.also {
+            it.stop()
+            cameraSource = null
         }
     }
 
-    private CameraSource makeCameraSource(LiveCamSystem liveCamSystem) {
-        return new CameraSource.Builder(getContext(), liveCamSystem.getDetector())
+    private fun makeCameraSource(liveCamSystem: LiveCamSystem?): CameraSource {
+        return CameraSource.Builder(context, liveCamSystem!!.getDetector())
                 .setFacing(CameraSource.CAMERA_FACING_FRONT)
-                .setRequestedFps(15)
+                .setRequestedFps(15f)
                 .setRequestedPreviewSize(768, 1024)
                 .setAutoFocusEnabled(true)
-                .build();
+                .build()
     }
 
     @SuppressLint("MissingPermission")
-    void start() {
-        cameraSource = makeCameraSource(liveCamSystem);
-        try {
-            cameraSource.start(getHolder());
-
-            int prevSizeW = cameraSource.getPreviewSize().getWidth();
-            int prevSizeH = cameraSource.getPreviewSize().getHeight();
-
-            Timber.i("Preview Size: %dx%d", prevSizeW, prevSizeH);
-            liveCamSystem.getViewModel().setPreviewSize(prevSizeW, prevSizeH);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            liveCamSystem.getViewModel().setError(e.getLocalizedMessage());
-        }
-    }
-
-    public void setPermissionReady(LiveCamSystem liveCamSystem) {
-        this.liveCamSystem = liveCamSystem;
-        permissionReady = true;
-        if (surfaceReady) {
-            start();
-        }
-    }
-
-    private void setCallback() {
-        getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
+    fun start() {
+        liveCamSystem?.also { system ->
+            cameraSource = makeCameraSource(liveCamSystem).also { source ->
+                try {
+                    source.start(holder)
+                    val prevSizeW = source.previewSize.width
+                    val prevSizeH = source.previewSize.height
+                    Timber.i("Preview Size: %dx%d", prevSizeW, prevSizeH)
+                    system.getViewModel().setPreviewSize(prevSizeW, prevSizeH)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    system.getViewModel().setError(e.localizedMessage)
+                }
             }
+        }
+    }
 
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                surfaceReady = true;
-                stop();
+    fun setPermissionReady(liveCamSystem: LiveCamSystem?) {
+        this.liveCamSystem = liveCamSystem
+        permissionReady = true
+        if (surfaceReady) {
+            start()
+        }
+    }
+
+    private fun setCallback() {
+        holder.addCallback(object : SurfaceHolder.Callback {
+            override fun surfaceCreated(holder: SurfaceHolder) {}
+            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+                surfaceReady = true
+                stop()
                 if (permissionReady) {
-                    start();
+                    start()
                 }
             }
 
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                stop();
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+                stop()
             }
-        });
+        })
+    }
+
+    init {
+        setCallback()
     }
 }

@@ -1,51 +1,41 @@
 /*
  * Copyright (c) 2020 rumburake@gmail.com
  */
+package com.threecats.livecam
 
-package com.threecats.livecam;
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Matrix
+import android.graphics.RectF
+import android.util.AttributeSet
+import android.util.SparseArray
+import android.view.View
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.RectF;
-import android.util.AttributeSet;
-import android.util.SparseArray;
-import android.view.View;
+class OverlayView : View {
+    private var transformMatrix = Matrix()
 
-public class OverlayView extends View {
+    constructor(context: Context?) : super(context) {}
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
 
-    private Matrix matrix;
-
-    public OverlayView(Context context) {
-        super(context);
+    var shapeSparseArray = SparseArray<BoxShape>()
+    fun addShape(key: Int, shape: BoxShape) {
+        shapeSparseArray.append(key, shape)
+        invalidate()
     }
 
-    public OverlayView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    fun delShape(key: Int) {
+        shapeSparseArray.delete(key)
+        invalidate()
     }
 
-    SparseArray<BoxShape> shapeSparseArray = new SparseArray<>();
-
-    public void addShape(int key, BoxShape shape) {
-        shapeSparseArray.append(key, shape);
-        invalidate();
+    fun setPreviewRect(previewRect: RectF) {
+        transformMatrix.setScale(width / -previewRect.width(), height / previewRect.height())
+        invalidate()
     }
 
-    public void delShape(int key) {
-        shapeSparseArray.delete(key);
-        invalidate();
-    }
-
-    public void setPreviewRect(RectF previewRect) {
-        matrix = new Matrix();
-        matrix.setScale( getWidth() / - previewRect.width() , getHeight() / previewRect.height());
-        invalidate();
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        for (int i = 0; i < shapeSparseArray.size(); ++i) {
-            shapeSparseArray.valueAt(i).draw(canvas, matrix);
+    override fun onDraw(canvas: Canvas) {
+        for (i in 0 until shapeSparseArray.size()) {
+            shapeSparseArray.valueAt(i).draw(canvas, transformMatrix)
         }
     }
 }

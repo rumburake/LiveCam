@@ -14,7 +14,6 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProviders
 import com.threecats.livecam.*
 import com.threecats.livecam.ErrorDialog.AckListener
-import com.threecats.livecam.face.FaceViewModel
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
@@ -60,7 +59,7 @@ class FaceActivity : AppCompatActivity(), AckListener {
                         .show(supportFragmentManager, ERROR_TAG)
             }
         })
-        viewModel.getPreviewRectData().observe(this, { previewRect ->
+        viewModel.previewRectData.observe(this, { previewRect ->
             if (previewRect != null) {
                 overlayView.setPreviewRect(previewRect)
                 overlayView.addShape(KEY_ALL, BoxShape(previewRect, markerSize, BoxShape.XType.X_BORDER, Color.BLUE))

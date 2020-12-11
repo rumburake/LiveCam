@@ -1,55 +1,45 @@
 /*
  * Copyright (c) 2020 rumburake@gmail.com
  */
+package com.threecats.livecam
 
-package com.threecats.livecam;
+import android.app.Dialog
+import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
 
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AlertDialog;
+class ErrorDialog : DialogFragment() {
+    private var argMessage: String? = null
+    private var argAck: String? = null
 
-public class ErrorDialog extends DialogFragment {
-
-    public static final String ARG_MESSAGE = "arg_message";
-    public static final String ARG_ACK = "arg_ack";
-
-    private String argMessage;
-    private String argAck;
-
-    public interface AckListener {
-        void ack();
+    interface AckListener {
+        fun ack()
     }
 
-    public static ErrorDialog newInstance(String messageText, String ackText) {
-        Bundle args = new Bundle();
-        args.putString(ARG_MESSAGE, messageText);
-        args.putString(ARG_ACK, ackText);
-        ErrorDialog errorDialog = new ErrorDialog();
-        errorDialog.setArguments(args);
-        return errorDialog;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        argMessage = arguments!!.getString(ARG_MESSAGE)
+        argAck = arguments!!.getString(ARG_ACK)
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        argMessage = getArguments().getString(ARG_MESSAGE);
-        argAck = getArguments().getString(ARG_ACK);
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the Builder class for convenient dialog construction
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        val builder = AlertDialog.Builder(activity!!)
         builder.setMessage(argMessage)
-                .setPositiveButton(argAck, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        ((AckListener)getActivity()).ack();
-                    }
-                });
-        return builder.create();
+                .setPositiveButton(argAck) { dialog, id -> (activity as AckListener?)!!.ack() }
+        return builder.create()
+    }
+
+    companion object {
+        const val ARG_MESSAGE = "arg_message"
+        const val ARG_ACK = "arg_ack"
+        fun newInstance(messageText: String?, ackText: String?): ErrorDialog {
+            val args = Bundle()
+            args.putString(ARG_MESSAGE, messageText)
+            args.putString(ARG_ACK, ackText)
+            val errorDialog = ErrorDialog()
+            errorDialog.arguments = args
+            return errorDialog
+        }
     }
 }

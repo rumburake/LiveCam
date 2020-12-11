@@ -1,36 +1,35 @@
 /*
  * Copyright (c) 2020 rumburake@gmail.com
  */
+package com.threecats.livecam
 
-package com.threecats.livecam;
+import android.graphics.RectF
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-import android.graphics.RectF;
+abstract class LiveCamViewModel<Item> : ViewModel() {
+    private val previewRectDataObs = MutableLiveData<RectF>()
+    val previewRectData: LiveData<RectF>
+        get() = previewRectDataObs
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+    private val errorObs = MutableLiveData<String>()
+    val error: LiveData<String>
+        get() = errorObs
 
-public abstract class LiveCamViewModel<Item> extends ViewModel {
+    protected var previewWidth = 0f
+    protected var previewHeight = 0f
 
-    public MutableLiveData<RectF> previewRectData = new MutableLiveData<>();
-    public LiveData<RectF> getPreviewRectData() { return previewRectData; }
-
-    private MutableLiveData<String> errorObs = new MutableLiveData<>();
-    public LiveData<String> getError() { return errorObs; }
-
-    protected float previewWidth;
-    protected float previewHeight;
-
-    protected void setPreviewSize(int w, int h) {
+    fun setPreviewSize(w: Int, h: Int) {
         // rotated preview comes in portrait
-        previewWidth = h;
-        previewHeight = w;
-        previewRectData.setValue(new RectF(previewWidth, 0, 0, previewHeight));
+        previewWidth = h.toFloat()
+        previewHeight = w.toFloat()
+        previewRectDataObs.setValue(RectF(previewWidth, 0F, 0F, previewHeight))
     }
 
-    protected void setError(String error) {
-        errorObs.setValue(error);
+    fun setError(error: String) {
+        errorObs.value = error
     }
 
-    protected abstract void setItem(Item item);
+    protected abstract fun setItem(item: Item)
 }
