@@ -26,17 +26,17 @@ public class OverlayView extends View {
 
     SparseArray<BoxShape> shapeSparseArray = new SparseArray<>();
 
-    void addShape(int key, BoxShape shape) {
+    public void addShape(int key, BoxShape shape) {
         shapeSparseArray.append(key, shape);
         invalidate();
     }
 
-    void delShape(int key) {
+    public void delShape(int key) {
         shapeSparseArray.delete(key);
         invalidate();
     }
 
-    void setPreviewRect(RectF previewRect) {
+    public void setPreviewRect(RectF previewRect) {
         matrix = new Matrix();
         matrix.setScale( getWidth() / - previewRect.width() , getHeight() / previewRect.height());
         invalidate();

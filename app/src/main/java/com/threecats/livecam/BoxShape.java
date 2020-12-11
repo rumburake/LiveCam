@@ -16,7 +16,7 @@ public class BoxShape {
     private final float markerSize;
     private final XType xType;
 
-    BoxShape(RectF src, float markerSize, XType xType, int color) {
+    public BoxShape(RectF src, float markerSize, XType xType, int color) {
         this.src = src;
         paint = new Paint();
         paint.setColor(color);

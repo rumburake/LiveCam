@@ -2,21 +2,28 @@
  * Copyright (c) 2020 rumburake@gmail.com
  */
 
-package com.threecats.livecam;
+package com.threecats.livecam.face;
 
 import android.Manifest;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
+import com.threecats.livecam.BoxShape;
+import com.threecats.livecam.ErrorDialog;
+import com.threecats.livecam.OverlayView;
+import com.threecats.livecam.PreviewSurface;
+import com.threecats.livecam.R;
 
 import timber.log.Timber;
 
@@ -118,10 +125,16 @@ public class FaceActivity extends AppCompatActivity implements ErrorDialog.AckLi
     public static final int KEY_ALL = 0;
     public static final int KEY_FACE = 1;
 
+    void startPreviewWithFaceDetection() {
+        previewSurface.setPermissionReady(
+                new LiveCamFaceSystem(this, viewModel)
+        );
+    }
+
     void setupPermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED) {
-            previewSurface.setPermissionReady(viewModel);
+            startPreviewWithFaceDetection();
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQ_PERM_CAMERA);
         }
@@ -134,7 +147,7 @@ public class FaceActivity extends AppCompatActivity implements ErrorDialog.AckLi
             case REQ_PERM_CAMERA:
                 if (grantResults.length > 0) {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        previewSurface.setPermissionReady(viewModel);
+                        startPreviewWithFaceDetection();
                     } else {
                         ErrorDialog.newInstance(getString(R.string.cannot_run_face_detect), getString(R.string.understood))
                                 .show(getSupportFragmentManager(), ERROR_TAG);

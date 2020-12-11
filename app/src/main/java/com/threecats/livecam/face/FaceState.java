@@ -2,7 +2,7 @@
  * Copyright (c) 2020 rumburake@gmail.com
  */
 
-package com.threecats.livecam;
+package com.threecats.livecam.face;
 
 public enum FaceState {
     NO_FACE,

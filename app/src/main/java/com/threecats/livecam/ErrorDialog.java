@@ -19,11 +19,11 @@ public class ErrorDialog extends DialogFragment {
     private String argMessage;
     private String argAck;
 
-    interface AckListener {
+    public interface AckListener {
         void ack();
     }
 
-    static ErrorDialog newInstance(String messageText, String ackText) {
+    public static ErrorDialog newInstance(String messageText, String ackText) {
         Bundle args = new Bundle();
         args.putString(ARG_MESSAGE, messageText);
         args.putString(ARG_ACK, ackText);

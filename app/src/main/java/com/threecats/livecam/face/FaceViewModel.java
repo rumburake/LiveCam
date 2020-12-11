@@ -2,61 +2,35 @@
  * Copyright (c) 2020 rumburake@gmail.com
  */
 
-package com.threecats.livecam;
+package com.threecats.livecam.face;
+
+import android.graphics.RectF;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import android.graphics.RectF;
 
 import com.google.android.gms.vision.face.Face;
+import com.threecats.livecam.LiveCamViewModel;
 
-public class FaceViewModel extends ViewModel {
-
-    float previewWidth;
-    float previewHeight;
-
-    public static final float faceScale = 0.8f; // fix face area which is returned larger than it is
+public class FaceViewModel extends LiveCamViewModel<Face> {
 
     public static final float thresEdge = 0.2f; // edge size out of preview
     public static final float thresHeight = 0.4f; // min height out of preview
+    public static final float faceScale = 0.8f; // fix face area which is returned larger than it is
 
     private MutableLiveData<FaceState> faceStateObs = new MutableLiveData<>();
-
     public LiveData<FaceState> getFaceState() {
         return faceStateObs;
     }
 
-    private MutableLiveData<String> errorObs = new MutableLiveData<>();
-
-    public LiveData<String> getError() {
-        return errorObs;
-    }
-
-    public MutableLiveData<RectF> previewRectData = new MutableLiveData<>();
-
-    public LiveData<RectF> getPreviewRectData() {
-        return previewRectData;
-    }
-
     public MutableLiveData<RectF> faceRectData = new MutableLiveData<>();
-
     public LiveData<RectF> getFaceRectData() {
         return faceRectData;
     }
 
-    void setPreviewSize(int w, int h) {
-        // rotated preview comes in portrait
-        previewWidth = h;
-        previewHeight = w;
-        previewRectData.setValue(new RectF(previewWidth, 0, 0, previewHeight));
-    }
 
-    void setError(String error) {
-        errorObs.setValue(error);
-    }
-
-    void setFace(Face face) {
+    @Override
+    public void setItem(Face face) {
 
         FaceState faceState;
 
@@ -97,8 +71,6 @@ public class FaceViewModel extends ViewModel {
         if (!faceState.equals(faceStateObs.getValue())) {
             faceStateObs.postValue(faceState);
         }
-
-
     }
 
 }

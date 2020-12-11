@@ -21,7 +21,7 @@ public class PreviewSurface extends SurfaceView {
     CameraSource cameraSource;
     boolean surfaceReady = false;
     boolean permissionReady = false;
-    FaceViewModel viewModel;
+    LiveCamSystem liveCamSystem;
 
     public PreviewSurface(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -44,9 +44,18 @@ public class PreviewSurface extends SurfaceView {
         }
     }
 
+    private CameraSource makeCameraSource(LiveCamSystem liveCamSystem) {
+        return new CameraSource.Builder(getContext(), liveCamSystem.getDetector())
+                .setFacing(CameraSource.CAMERA_FACING_FRONT)
+                .setRequestedFps(15)
+                .setRequestedPreviewSize(768, 1024)
+                .setAutoFocusEnabled(true)
+                .build();
+    }
+
     @SuppressLint("MissingPermission")
     void start() {
-        cameraSource = FaceAlign.init(this, viewModel);
+        cameraSource = makeCameraSource(liveCamSystem);
         try {
             cameraSource.start(getHolder());
 
@@ -54,16 +63,16 @@ public class PreviewSurface extends SurfaceView {
             int prevSizeH = cameraSource.getPreviewSize().getHeight();
 
             Timber.i("Preview Size: %dx%d", prevSizeW, prevSizeH);
-            viewModel.setPreviewSize(prevSizeW, prevSizeH);
+            liveCamSystem.getViewModel().setPreviewSize(prevSizeW, prevSizeH);
 
         } catch (IOException e) {
             e.printStackTrace();
-            viewModel.setError(e.getLocalizedMessage());
+            liveCamSystem.getViewModel().setError(e.getLocalizedMessage());
         }
     }
 
-    void setPermissionReady(FaceViewModel viewModel) {
-        this.viewModel = viewModel;
+    public void setPermissionReady(LiveCamSystem liveCamSystem) {
+        this.liveCamSystem = liveCamSystem;
         permissionReady = true;
         if (surfaceReady) {
             start();
