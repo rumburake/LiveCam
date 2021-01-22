@@ -10,6 +10,8 @@
     <string name="align_face">Align Face</string>
     <string name="move_left">Move Left</string>
     <string name="move_right">Move Right</string>
+    <string name="move_up">Move Up</string>
+    <string name="move_down">Move Down</string>
     <string name="come_closer">Come Closer</string>
     <string name="ready">Ready!</string>
 </resources>

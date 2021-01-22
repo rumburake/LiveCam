@@ -37,14 +37,25 @@ class FaceViewModel : LiveCamViewModel<Face?>() {
             val ft = cenY - adjH / 2
             val fb = cenY + adjH / 2
             faceRectDataObs.postValue(RectF(fl, ft, fr, fb))
-            faceState = if (adjW < previewHeight * thresHeight) {
-                FaceState.TOO_FAR
-            } else if (fl < previewWidth * thresEdge) {
-                FaceState.TOO_RIGHT
-            } else if (fr > previewWidth * (1 - thresEdge)) {
-                FaceState.TOO_LEFT
-            } else {
-                FaceState.FINE
+            faceState = when {
+                adjW < previewHeight * thresHeight -> {
+                    FaceState.TOO_FAR
+                }
+                fl < previewWidth * thresEdge -> {
+                    FaceState.TOO_RIGHT
+                }
+                fr > previewWidth * (1 - thresEdge) -> {
+                    FaceState.TOO_LEFT
+                }
+                ft < previewHeight * thresEdge -> {
+                    FaceState.TOO_UP
+                }
+                fb > previewHeight * (1 - thresEdge) -> {
+                    FaceState.TOO_DOWN
+                }
+                else -> {
+                    FaceState.FINE
+                }
             }
         }
         if (faceState != faceStateObs.value) {
@@ -53,7 +64,7 @@ class FaceViewModel : LiveCamViewModel<Face?>() {
     }
 
     companion object {
-        const val thresEdge = 0.2f // edge size out of preview
+        const val thresEdge = 0.1f // edge size out of preview
         const val thresHeight = 0.4f // min height out of preview
         const val faceScale = 0.8f // fix face area which is returned larger than it is
     }

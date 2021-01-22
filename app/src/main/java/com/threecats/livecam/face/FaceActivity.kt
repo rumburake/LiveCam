@@ -48,6 +48,8 @@ class FaceActivity : AppCompatActivity(), AckListener {
                     FaceState.FINE -> textView.setText(R.string.ready)
                     FaceState.TOO_LEFT -> textView.setText(R.string.move_right)
                     FaceState.TOO_RIGHT -> textView.setText(R.string.move_left)
+                    FaceState.TOO_UP -> textView.setText(R.string.move_down)
+                    FaceState.TOO_DOWN -> textView.setText(R.string.move_up)
                     FaceState.TOO_FAR -> textView.setText(R.string.come_closer)
                     FaceState.NO_FACE -> textView.setText(R.string.align_face)
                 }
